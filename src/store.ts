@@ -8,6 +8,7 @@ export function createStore<S extends any, A>(
 ) {
   const listeners: Function[] = [];
   let currentState = reducerFn({} as S, { type: "" });
+  console.log(currentState);
 
   const store = {
     addListener(listener: Function) {
@@ -17,6 +18,9 @@ export function createStore<S extends any, A>(
     dispatch(action: action<A>) {
       currentState = reducerFn(currentState, action);
       listeners.forEach((listener) => listener()); //update listeners
+    },
+    getValue() {
+      return currentState;
     }
   };
   return store;
@@ -24,13 +28,16 @@ export function createStore<S extends any, A>(
 
 type stateType = { count: number };
 
-const actions = {
+export const actions = {
   increment: { type: "increment" },
   decrement: { type: "decrement" },
   addValue: { type: "addvalue" }
 };
 
-const myReducer = (state: stateType = { count: 0 }, action: action<number>) => {
+const myReducer = (state: stateType, action: action<number>) => {
+  if (Object.keys(state).length === 0 && state.constructor === Object) {
+    state = { count: 0 };
+  }
   switch (action.type) {
     case actions.increment.type: {
       return { count: state.count + 1 };
